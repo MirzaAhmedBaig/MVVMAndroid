@@ -14,9 +14,9 @@ import java.util.concurrent.TimeUnit
 object ApiClient {
     val instance: ApiManager = Retrofit.Builder().run {
         val gson = GsonBuilder()
-                .enableComplexMapKeySerialization()
-                .setPrettyPrinting()
-                .create()
+            .enableComplexMapKeySerialization()
+            .setPrettyPrinting()
+            .create()
 
         baseUrl(BASE_URL)
         addConverterFactory(GsonConverterFactory.create(gson))
@@ -35,19 +35,19 @@ object ApiClient {
 
         return if (DEBUG) {
             OkHttpClient.Builder()
-                    .addInterceptor(interceptor)
-                    .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-                    .connectTimeout(REQUEST_TIMEOUT_DURATION.toLong(), TimeUnit.SECONDS)
-                    .readTimeout(REQUEST_TIMEOUT_DURATION.toLong(), TimeUnit.SECONDS)
-                    .writeTimeout(REQUEST_TIMEOUT_DURATION.toLong(), TimeUnit.SECONDS)
-                    .build()
+                .addInterceptor(interceptor)
+                .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+                .connectTimeout(REQUEST_TIMEOUT_DURATION.toLong(), TimeUnit.SECONDS)
+                .readTimeout(REQUEST_TIMEOUT_DURATION.toLong(), TimeUnit.SECONDS)
+                .writeTimeout(REQUEST_TIMEOUT_DURATION.toLong(), TimeUnit.SECONDS)
+                .build()
         } else {
             OkHttpClient.Builder()
-                    .addInterceptor(interceptor)
-                    .connectTimeout(REQUEST_TIMEOUT_DURATION.toLong(), TimeUnit.SECONDS)
-                    .readTimeout(REQUEST_TIMEOUT_DURATION.toLong(), TimeUnit.SECONDS)
-                    .writeTimeout(REQUEST_TIMEOUT_DURATION.toLong(), TimeUnit.SECONDS)
-                    .build()
+                .addInterceptor(interceptor)
+                .connectTimeout(REQUEST_TIMEOUT_DURATION.toLong(), TimeUnit.SECONDS)
+                .readTimeout(REQUEST_TIMEOUT_DURATION.toLong(), TimeUnit.SECONDS)
+                .writeTimeout(REQUEST_TIMEOUT_DURATION.toLong(), TimeUnit.SECONDS)
+                .build()
         }
     }
 }

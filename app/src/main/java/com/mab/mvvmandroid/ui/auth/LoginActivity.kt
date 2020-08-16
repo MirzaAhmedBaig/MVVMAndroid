@@ -1,21 +1,40 @@
 package com.mab.mvvmandroid.ui.auth
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
-import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.mab.mvvmandroid.R
+import com.mab.mvvmandroid.data.db.AppDatabase
+import com.mab.mvvmandroid.data.db.entities.User
+import com.mab.mvvmandroid.data.network.ApiClient
+import com.mab.mvvmandroid.data.repositories.UserRepository
 import com.mab.mvvmandroid.databinding.ActivityLoginBinding
 import com.mab.mvvmandroid.extensions.context.showShortToast
 import com.mab.mvvmandroid.extensions.view.makeHidden
 import com.mab.mvvmandroid.extensions.view.makeVisible
+import com.mab.mvvmandroid.ui.MainActivity
 import kotlinx.android.synthetic.main.activity_login.*
 
 class LoginActivity : AppCompatActivity(), AuthListener {
 
+    private val apiManager by lazy {
+        ApiClient.instance
+    }
+
+    private val db by lazy {
+        AppDatabase(this)
+    }
+
+    private val userRepository by lazy {
+        UserRepository(apiManager, db)
+    }
+
     private val authViewModel by lazy {
-        ViewModelProviders.of(this).get(AuthViewModel::class.java).apply {
+        val factory = AuthViewModelFactory(userRepository)
+        ViewModelProviders.of(this, factory).get(AuthViewModel::class.java).apply {
             authListener = this@LoginActivity
         }
     }
@@ -25,6 +44,15 @@ class LoginActivity : AppCompatActivity(), AuthListener {
         val binding: ActivityLoginBinding =
             DataBindingUtil.setContentView(this, R.layout.activity_login)
         binding.authViewModel = authViewModel
+
+        authViewModel.getLoggedInUser().observe(this, Observer { user ->
+            if (user != null) {
+                Intent(this, MainActivity::class.java).also {
+                    it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(it)
+                }
+            }
+        })
     }
 
     override fun onStarted() {
@@ -32,9 +60,9 @@ class LoginActivity : AppCompatActivity(), AuthListener {
         showShortToast("onStarted")
     }
 
-    override fun onSuccess(message: String) {
+    override fun onSuccess(user: User) {
         progress_bar.makeHidden()
-        showShortToast(message)
+//        showShortToast("${user.name} is Logged In")
     }
 
     override fun onFailed(message: String) {
