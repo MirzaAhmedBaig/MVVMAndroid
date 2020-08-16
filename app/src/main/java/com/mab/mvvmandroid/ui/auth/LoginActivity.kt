@@ -10,6 +10,7 @@ import com.mab.mvvmandroid.R
 import com.mab.mvvmandroid.data.db.AppDatabase
 import com.mab.mvvmandroid.data.db.entities.User
 import com.mab.mvvmandroid.data.network.ApiClient
+import com.mab.mvvmandroid.data.network.NetworkConnectionInterceptor
 import com.mab.mvvmandroid.data.repositories.UserRepository
 import com.mab.mvvmandroid.databinding.ActivityLoginBinding
 import com.mab.mvvmandroid.extensions.context.showShortToast
@@ -20,8 +21,12 @@ import kotlinx.android.synthetic.main.activity_login.*
 
 class LoginActivity : AppCompatActivity(), AuthListener {
 
+    private val networkConnectionInterceptor by lazy {
+        NetworkConnectionInterceptor(this)
+    }
+
     private val apiManager by lazy {
-        ApiClient.instance
+        ApiClient(networkConnectionInterceptor)
     }
 
     private val db by lazy {

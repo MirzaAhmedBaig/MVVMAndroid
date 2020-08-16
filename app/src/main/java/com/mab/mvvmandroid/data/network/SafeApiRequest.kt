@@ -9,12 +9,7 @@ abstract class SafeApiRequest {
 
     suspend fun <T : Any> apiRequest(call: suspend () -> Response<T>): T {
 
-        val response = try {
-            call()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            throw ApiExceptions(e.message, null)
-        }
+        val response = call()
         if (response.isSuccessful) {
             return response.body()!!
         } else {
